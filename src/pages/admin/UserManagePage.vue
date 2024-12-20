@@ -145,10 +145,10 @@ import { message, Modal } from 'ant-design-vue'
 import { UserOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import type { TableProps } from 'ant-design-vue'
 import {
-  listVoPageUsingPost,
+  listUserVoPageUsingPost,
   deleteUserUsingPost,
   updateUserUsingPost,
-  addUserUsingPost,
+  addUserUsingPost
 } from '@/service/api/userController'
 
 interface TableColumn {
@@ -192,7 +192,7 @@ const addFormRules = ref({
 const loadData = async (params = {}) => {
   loading.value = true
   try {
-    const res = await listVoPageUsingPost({
+    const res = await listUserVoPageUsingPost({
       ...searchForm.value,
       current: current.value,
       pageSize: pageSize.value,

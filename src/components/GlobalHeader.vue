@@ -45,6 +45,7 @@ import { useRouter } from 'vue-router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore'
 import { message } from 'ant-design-vue'
 import { userLogoutUsingPost } from '@/service/api/userController'
+import PictureUpload from "@/pages/picture/components/PictureUpload.vue";
 const current = ref<string[]>(['mail'])
 const userStore = useLoginUserStore()
 
@@ -60,7 +61,11 @@ const baseMenuItems = [
     label: '关于',
     title: '关于',
   },
-
+  {
+    key: '/picture/upload',
+    label: '图片上传',
+    title:  '图片上传',
+  },
   {
     key: '/admin/userManage',
     label: '用户管理',
@@ -68,10 +73,19 @@ const baseMenuItems = [
     role: 'admin',
   },
   {
-    key: 'others',
+    key: '/admin/pictureManage',
+    label: '图片管理',
+    title: '图片管理',
+    role: 'admin',
+  },
+
+
+  {
+    key: '/others',
     label: h('a', { href: 'https://github.com/noeltzy', target: '_blank' }, '支持我'),
     title: '支持我',
   },
+
 ]
 
 const filterMenuItems = (items = [] as typeof baseMenuItems) => {
