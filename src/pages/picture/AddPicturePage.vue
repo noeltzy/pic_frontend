@@ -1,10 +1,20 @@
 <template>
   <div id="addPicturePage">
     <h2 style="margin-bottom: 16px">{{ oldPic?.id ? '修改图片' : '创建图片' }}</h2>
-    <PictureUpload :picture="picture" :onSuccess="onSuccess" />
+
+    <!--    图片上传组件url-->
+    <a-tabs v-model:activeKey="activeKey">
+      <a-tab-pane key="file" tab="文件上传">
+        <PictureUpload :picture="picture" :onSuccess="onSuccess" />
+      </a-tab-pane>
+      <a-tab-pane key="url" tab="url上传" force-render>
+        <UrlPictureUpload :picture="picture" :onSuccess="onSuccess" />
+      </a-tab-pane>
+    </a-tabs>
+
     <a-form v-if="picture?.id" layout="vertical" :model="pictureForm" @finish="handleSubmit">
       <a-form-item label="名称" name="name">
-        <a-input v-model:value="pictureForm.name" placeholder="请输入名称" />
+        <a-input v-model:value="pictureForm.name" :default-value="picture?.picName" placeholder="请输入名称" />
       </a-form-item>
       <a-form-item label="简介" name="introduction">
         <a-textarea
@@ -33,9 +43,9 @@
         />
       </a-form-item>
       <a-form-item>
-        <a-button type="primary" html-type="submit" style="width: 100%">{{
-          oldPic?.id ? '修改图片' : '创建图片'
-        }}</a-button>
+        <a-button type="primary" html-type="submit" style="width: 100%"
+          >{{ oldPic?.id ? '修改图片' : '创建图片' }}
+        </a-button>
       </a-form-item>
     </a-form>
   </div>
@@ -51,6 +61,7 @@ import {
   getTagCategoryUsingGet,
 } from '@/service/api/pictureController.ts'
 import { useRoute, useRouter } from 'vue-router'
+import UrlPictureUpload from '@/pages/picture/components/UrlPictureUpload.vue'
 
 const picture = ref<API.PictureVo>()
 const pictureForm = reactive<API.PictureEditRequest>({})
@@ -58,7 +69,7 @@ const onSuccess = (newPicture: API.PictureVo) => {
   picture.value = newPicture
 }
 const router = useRouter()
-
+const activeKey = ref<'file' | 'url'>('file')
 /**
  * 提交表单
  * @param values

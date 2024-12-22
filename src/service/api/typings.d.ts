@@ -5,6 +5,12 @@ declare namespace API {
     message?: string
   }
 
+  type BaseResponseInt_ = {
+    code?: number
+    data?: number
+    message?: string
+  }
+
   type BaseResponseLoginUserVo_ = {
     code?: number
     data?: LoginUserVo
@@ -20,6 +26,12 @@ declare namespace API {
   type BaseResponseObject_ = {
     code?: number
     data?: Record<string, any>
+    message?: string
+  }
+
+  type BaseResponsePagePicture_ = {
+    code?: number
+    data?: PagePicture_
     message?: string
   }
 
@@ -108,6 +120,14 @@ declare namespace API {
     userRole?: string
   }
 
+  type PagePicture_ = {
+    current?: number
+    pages?: number
+    records?: Picture[]
+    size?: number
+    total?: number
+  }
+
   type PagePictureVo_ = {
     current?: number
     pages?: number
@@ -137,6 +157,10 @@ declare namespace API {
     picScale?: number
     picSize?: number
     picWidth?: number
+    reviewMessage?: string
+    reviewStatus?: number
+    reviewTime?: string
+    reviewerId?: number
     tags?: string
     updateTime?: string
     url?: string
@@ -163,11 +187,21 @@ declare namespace API {
     picScale?: number
     picSize?: number
     picWidth?: number
+    reviewMessage?: string
+    reviewStatus?: number
+    reviewTime?: string
+    reviewerId?: number
     searchText?: string
     sortField?: string
     sortOrder?: string
     tags?: string[]
     userId?: number
+  }
+
+  type PictureReviewRequest = {
+    id?: number
+    reviewMessage?: string
+    reviewStatus?: number
   }
 
   type PictureTagCategory = {
@@ -181,6 +215,21 @@ declare namespace API {
     introduction?: string
     name?: string
     tags?: string[]
+  }
+
+  type PictureUploadByBatchRequest = {
+    category?: string
+    count?: number
+    prefixName?: string
+    searchText?: string
+    tag?: string[]
+  }
+
+  type PictureUploadRequest = {
+    batchFetchDefaultName?: string
+    category?: string
+    id?: number
+    url?: string
   }
 
   type PictureVo = {
@@ -203,7 +252,10 @@ declare namespace API {
   }
 
   type uploadPictureUsingPOSTParams = {
+    batchFetchDefaultName?: string
+    category?: string
     id?: number
+    url?: string
   }
 
   type User = {

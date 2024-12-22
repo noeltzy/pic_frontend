@@ -9,6 +9,7 @@ import { message } from 'ant-design-vue'
 import AddPicturePage from '@/pages/picture/AddPicturePage.vue'
 import PictureManagePage from '@/pages/admin/PictureManagePage.vue'
 import PictureDetailPage from '@/pages/picture/PictureDetailPage.vue'
+import BatchAddPicturePage from "@/pages/picture/BatchAddPicturePage.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -47,6 +48,11 @@ const router = createRouter({
       path: '/admin/pictureManage',
       name: '图片管理',
       component: PictureManagePage,
+    },
+    {
+      path: '/picture/batchUpload',
+      name: '批量添加',
+      component: BatchAddPicturePage,
     },
     {
       path: '/about',

@@ -1,5 +1,5 @@
 <template>
-  <div class="upload-picture-container">
+  <div class="picture-container">
     <a-upload
       list-type="picture-card"
       :show-upload-list="false"
@@ -54,14 +54,14 @@ const handleUpload = async ({ file }: any) => {
 }
 </script>
 <style scoped>
-.upload-picture-container:deep(.ant-upload) {
+.picture-container:deep(.ant-upload) {
   width: 100% !important;
   height: 100% !important;
   min-height: 152px;
   min-width: 152px;
 }
 
-.upload-picture-container img {
+.picture-container img {
   max-width: 100%;
   max-height: 480px;
 }

@@ -3,7 +3,7 @@ import axios from 'axios'
 
 const request = axios.create({
   baseURL: 'http://localhost:8881',
-  timeout: 5000,
+  timeout: 50000,
   withCredentials: true,
 })
 // 全局请求拦截器

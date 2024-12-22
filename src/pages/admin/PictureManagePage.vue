@@ -34,6 +34,26 @@
             </a-select-option>
           </a-select>
         </a-form-item>
+
+        <a-form-item label="审核状态">
+          <a-select
+            v-model:value="searchForm.reviewStatus"
+            placeholder="请选择审核状态"
+            style="width: 100px"
+            allow-clear
+          >
+            <a-select-option value="0">
+              未审核
+            </a-select-option>
+            <a-select-option value="1">
+              审核通过
+            </a-select-option>
+            <a-select-option value="2">
+              审核拒绝
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+
         <a-form-item>
           <a-space>
             <a-button type="primary" @click="loadData">搜索</a-button>
@@ -56,6 +76,11 @@
           上传图片
         </a-button>
       </a-upload>
+
+      <a-button @click="handleBatchUpload" type="primary">
+        <template  #icon><UploadOutlined /></template>
+        批量上传
+      </a-button>
     </div>
 
     <!-- 图片列表 -->
@@ -67,9 +92,7 @@
         current,
         pageSize,
         total,
-        showSizeChanger: true,
-        showQuickJumper: true,
-        showTotal: (total: number) => `共 ${total} 条记录`,
+        showTotal: () => `共 ${total} 条记录`,
       }"
       @change="handleTableChange"
       row-key="id"
@@ -85,13 +108,20 @@
           <p>大小：{{ formatFileSize(record.picSize) }}</p>
         </div>
       </template>
+      <template #reviewInfo="{ record }">
+        <div class="pic-info">
+          <p>审核人：{{ record.reviewerId }}</p>
+          <p>审核状态：{{PIC_REVIEW_STATUS_MAP[record.reviewStatus]}}</p>
+          <p>消息：{{ record.reviewMessage }}</p>
+        </div>
+      </template>
       <template #categoryAndTags="{ record }">
         <div class="category-tags">
           <div class="category-label">
             <a-tag color="green">{{ record.category || '默认分类' }}</a-tag>
           </div>
           <div class="tags-container" v-if="record.tags && record.tags.length">
-            <a-tag v-for="tag in record.tags" :key="tag" color="blue" class="small-tag">
+            <a-tag v-for="tag in JSON.parse(record.tags)" :key="tag" color="blue" class="small-tag">
               {{ tag }}
             </a-tag>
           </div>
@@ -105,46 +135,23 @@
           <a-button type="link" danger @click="handleDelete(record)">删除</a-button>
         </a-space>
       </template>
+      <template #review="{ record }">
+        <a-space>
+          <a-button v-if="record.reviewStatus!==1" type="link" @click="handleReview(record,1)" target="_blank"
+          >通过</a-button
+          >
+          <a-button v-if="record.reviewStatus!==2" type="link" danger @click="handleReview(record,2)">拒绝</a-button>
+        </a-space>
+      </template>
+
     </a-table>
-
-    <!-- 编辑图片弹窗 -->
-    <a-modal
-      v-model:visible="editVisible"
-      title="编辑图片"
-      @ok="handleEditSubmit"
-      :confirm-loading="editLoading"
-    >
-      <a-form :model="editForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
-        <a-form-item label="图片名称">
-          <a-input v-model:value="editForm.name" />
-        </a-form-item>
-        <a-form-item label="分类">
-          <a-select v-model:value="editForm.category">
-            <a-select-option v-for="category in categories" :key="category" :value="category">
-              {{ category }}
-            </a-select-option>
-          </a-select>
-        </a-form-item>
-        <a-form-item label="标签">
-          <a-select v-model:value="editForm.tags" mode="multiple">
-            <a-select-option v-for="tag in tags" :key="tag" :value="tag">
-              {{ tag }}
-            </a-select-option>
-          </a-select>
-        </a-form-item>
-        <a-form-item label="简介">
-          <a-textarea v-model:value="editForm.introduction" />
-        </a-form-item>
-      </a-form>
-    </a-modal>
-
     <!-- 图片预览弹窗 -->
     <a-modal
       v-model:visible="previewVisible"
       :footer="null"
       @cancel="() => (previewVisible = false)"
     >
-      <img :src="previewImage" style="width: 100%" />
+      <img :src="previewImage" style="width: 100%"  alt="_"/>
     </a-modal>
   </div>
 </template>
@@ -155,12 +162,12 @@ import { message, Modal } from 'ant-design-vue'
 import { UploadOutlined } from '@ant-design/icons-vue'
 import type { TableProps } from 'ant-design-vue'
 import {
-  listPictureVoPageUsingPost,
   deletePictureUsingPost,
-  editePictureUsingPost,
   uploadPictureUsingPost,
-  getTagCategoryUsingGet,
-} from '@/service/api/pictureController'
+  getTagCategoryUsingGet, listPicturePageUsingPost,reviewPictureUsingPost
+} from "@/service/api/pictureController";
+import { PIC_REVIEW_STATUS_MAP } from "@/constants/reviewStatusConstants.ts";
+import router from "@/router";
 
 // 表格列定义
 const columns = [
@@ -174,7 +181,7 @@ const columns = [
   },
   {
     title: '图片名称',
-    dataIndex: 'picName',
+    dataIndex: 'name',
     width: 150,
   },
   {
@@ -183,6 +190,13 @@ const columns = [
     width: 200,
     slots: {
       customRender: 'picInfo',
+    },
+  },
+  {
+    title: '审核信息',
+    with:150,
+    slots: {
+      customRender: 'reviewInfo',
     },
   },
   {
@@ -197,7 +211,17 @@ const columns = [
     title: '简介',
     dataIndex: 'introduction',
     ellipsis: true,
+    with:300,
   },
+
+  {
+    title: '审核',
+    width: 150,
+    slots: {
+      customRender: 'review',
+    },
+  },
+
   {
     title: '操作',
     width: 150,
@@ -208,7 +232,7 @@ const columns = [
 ]
 
 const loading = ref(false)
-const dataSource = ref<API.PictureVo[]>([])
+const dataSource = ref<API.Picture[]>([])
 const total = ref(0)
 const current = ref(1)
 const pageSize = ref(10)
@@ -252,7 +276,7 @@ const loadTagsAndCategories = async () => {
 const loadData = async (params = {}) => {
   loading.value = true
   try {
-    const res = await listPictureVoPageUsingPost({
+    const res = await listPicturePageUsingPost({
       ...searchForm.value,
       current: current.value,
       pageSize: pageSize.value,
@@ -291,6 +315,21 @@ const handleDelete = (record: API.PictureVo) => {
       }
     },
   })
+}
+// 处理审核
+const handleReview =async (record:API.Picture,reviewStatus:number)=>{
+  const reviewMessage = reviewStatus==1 ? '管理员审核通过' : '管理员审核拒绝'
+  const res=await reviewPictureUsingPost({
+    reviewStatus,
+    reviewMessage,
+    id:record.id
+  })
+  if(res.data?.code===0){
+    message.success('审核成功')
+    loadData()
+  }else{
+    message.error(res.data?.message || '审核失败')
+  }
 }
 
 // 处理分页变化
@@ -340,6 +379,14 @@ const handleUpload = async ({ file }: { file: File }) => {
     message.error('上传失败')
   }
 }
+
+// 批量上传: 直接跳转
+const handleBatchUpload=()=>{
+  router.push({
+    path: '/picture/batchUpload',
+  })
+}
+
 
 // 页面加载时获取数据
 onMounted(() => {
