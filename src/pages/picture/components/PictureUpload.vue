@@ -24,9 +24,10 @@ interface Props {
 }
 const props = defineProps<Props>()
 
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { PlusOutlined, LoadingOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
+import { useRoute } from 'vue-router'
 import type { UploadProps } from 'ant-design-vue'
 
 const loading = ref<boolean>(false)
@@ -42,9 +43,16 @@ const beforeUpload = (file: UploadProps['fileList'][number]) => {
   }
   return isJpgOrPng && isLt2M
 }
+const route = useRoute()
+
+const spaceId = computed(() => {
+  return route.query?.spaceId
+})
+
 const handleUpload = async ({ file }: any) => {
   loading.value = true
   const params = props.picture ? { id: props.picture.id } : {}
+  params.spaceId = spaceId.value
   const res = await uploadPictureUsingPost(params, {}, file)
   if (res.data?.code === 0 && res.data.data) {
     props.onSuccess?.(res.data.data)

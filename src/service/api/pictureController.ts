@@ -92,6 +92,21 @@ export async function listPictureVoPageUsingPost(
   })
 }
 
+/** listPictureVoPageWithCatch POST /api/picture/list/page/vo/catch */
+export async function listPictureVoPageWithCatchUsingPost(
+  body: API.PictureQueryRequest,
+  options?: { [key: string]: any }
+) {
+  return request<API.BaseResponsePagePictureVo_>('/api/picture/list/page/vo/catch', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  })
+}
+
 /** reviewPicture POST /api/picture/review */
 export async function reviewPictureUsingPost(
   body: API.PictureReviewRequest,

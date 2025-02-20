@@ -42,15 +42,9 @@
             style="width: 100px"
             allow-clear
           >
-            <a-select-option value="0">
-              未审核
-            </a-select-option>
-            <a-select-option value="1">
-              审核通过
-            </a-select-option>
-            <a-select-option value="2">
-              审核拒绝
-            </a-select-option>
+            <a-select-option value="0"> 未审核 </a-select-option>
+            <a-select-option value="1"> 审核通过 </a-select-option>
+            <a-select-option value="2"> 审核拒绝 </a-select-option>
           </a-select>
         </a-form-item>
 
@@ -78,7 +72,7 @@
       </a-upload>
 
       <a-button @click="handleBatchUpload" type="primary">
-        <template  #icon><UploadOutlined /></template>
+        <template #icon><UploadOutlined /></template>
         批量上传
       </a-button>
     </div>
@@ -108,10 +102,16 @@
           <p>大小：{{ formatFileSize(record.picSize) }}</p>
         </div>
       </template>
+
+      <template #spaceRender="{ record }">
+        <div class="space-info">
+          <p>{{ record.spaceId == undefined ? '公共图库' : record.spaceId }}</p>
+        </div>
+      </template>
       <template #reviewInfo="{ record }">
         <div class="pic-info">
           <p>审核人：{{ record.reviewerId }}</p>
-          <p>审核状态：{{PIC_REVIEW_STATUS_MAP[record.reviewStatus]}}</p>
+          <p>审核状态：{{ PIC_REVIEW_STATUS_MAP[record.reviewStatus] }}</p>
           <p>消息：{{ record.reviewMessage }}</p>
         </div>
       </template>
@@ -137,13 +137,22 @@
       </template>
       <template #review="{ record }">
         <a-space>
-          <a-button v-if="record.reviewStatus!==1" type="link" @click="handleReview(record,1)" target="_blank"
-          >通过</a-button
+          <a-button
+            v-if="record.reviewStatus !== 1"
+            type="link"
+            @click="handleReview(record, 1)"
+            target="_blank"
+            >通过</a-button
           >
-          <a-button v-if="record.reviewStatus!==2" type="link" danger @click="handleReview(record,2)">拒绝</a-button>
+          <a-button
+            v-if="record.reviewStatus !== 2"
+            type="link"
+            danger
+            @click="handleReview(record, 2)"
+            >拒绝</a-button
+          >
         </a-space>
       </template>
-
     </a-table>
     <!-- 图片预览弹窗 -->
     <a-modal
@@ -151,7 +160,7 @@
       :footer="null"
       @cancel="() => (previewVisible = false)"
     >
-      <img :src="previewImage" style="width: 100%"  alt="_"/>
+      <img :src="previewImage" style="width: 100%" alt="_" />
     </a-modal>
   </div>
 </template>
@@ -164,10 +173,12 @@ import type { TableProps } from 'ant-design-vue'
 import {
   deletePictureUsingPost,
   uploadPictureUsingPost,
-  getTagCategoryUsingGet, listPicturePageUsingPost,reviewPictureUsingPost
-} from "@/service/api/pictureController";
-import { PIC_REVIEW_STATUS_MAP } from "@/constants/reviewStatusConstants.ts";
-import router from "@/router";
+  getTagCategoryUsingGet,
+  listPicturePageUsingPost,
+  reviewPictureUsingPost,
+} from '@/service/api/pictureController'
+import { PIC_REVIEW_STATUS_MAP } from '@/constants/reviewStatusConstants.ts'
+import router from '@/router'
 
 // 表格列定义
 const columns = [
@@ -185,6 +196,14 @@ const columns = [
     width: 150,
   },
   {
+    title: '空间',
+    dataIndex: 'spaceId',
+    width: 150,
+    slots: {
+      customRender: 'spaceRender',
+    },
+  },
+  {
     title: '图片信息',
     dataIndex: 'picInfo',
     width: 200,
@@ -192,13 +211,7 @@ const columns = [
       customRender: 'picInfo',
     },
   },
-  {
-    title: '审核信息',
-    with:150,
-    slots: {
-      customRender: 'reviewInfo',
-    },
-  },
+
   {
     title: '分类/标签',
     dataIndex: 'categoryAndTags',
@@ -211,9 +224,15 @@ const columns = [
     title: '简介',
     dataIndex: 'introduction',
     ellipsis: true,
-    with:300,
+    with: 300,
   },
-
+  {
+    title: '审核信息',
+    with: 150,
+    slots: {
+      customRender: 'reviewInfo',
+    },
+  },
   {
     title: '审核',
     width: 150,
@@ -317,17 +336,17 @@ const handleDelete = (record: API.PictureVo) => {
   })
 }
 // 处理审核
-const handleReview =async (record:API.Picture,reviewStatus:number)=>{
-  const reviewMessage = reviewStatus==1 ? '管理员审核通过' : '管理员审核拒绝'
-  const res=await reviewPictureUsingPost({
+const handleReview = async (record: API.Picture, reviewStatus: number) => {
+  const reviewMessage = reviewStatus == 1 ? '管理员审核通过' : '管理员审核拒绝'
+  const res = await reviewPictureUsingPost({
     reviewStatus,
     reviewMessage,
-    id:record.id
+    id: record.id,
   })
-  if(res.data?.code===0){
+  if (res.data?.code === 0) {
     message.success('审核成功')
     loadData()
-  }else{
+  } else {
     message.error(res.data?.message || '审核失败')
   }
 }
@@ -381,12 +400,11 @@ const handleUpload = async ({ file }: { file: File }) => {
 }
 
 // 批量上传: 直接跳转
-const handleBatchUpload=()=>{
+const handleBatchUpload = () => {
   router.push({
     path: '/picture/batchUpload',
   })
 }
-
 
 // 页面加载时获取数据
 onMounted(() => {

@@ -2,6 +2,7 @@
   <div id="basic-layout">
     <a-layout style="min-height: 100vh">
       <a-layout-header><GlobalHeader /></a-layout-header>
+      <div class="side"><GlobalSider /></div>
       <a-layout-content class="content">
         <div class="content-container">
           <RouterView />
@@ -16,10 +17,14 @@
 </template>
 
 <script setup lang="ts">
+import GlobalSider from '@/components/GlobalSider.vue'
 import GlobalHeader from '@/components/GlobalHeader.vue'
 </script>
 
 <style scoped>
+.side {
+  margin-top: 80px;
+}
 #basic-layout .ant-layout-header {
   background: #fff;
   padding: 0 24px;

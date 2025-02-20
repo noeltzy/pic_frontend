@@ -1,5 +1,9 @@
 <template>
   <div id="addPicturePage">
+    <a-typography-paragraph v-if="spaceId" type="secondary">
+      保存至空间：<a :href="`/space/${spaceId}`" target="_blank">{{ spaceId }}</a>
+    </a-typography-paragraph>
+
     <h2 style="margin-bottom: 16px">{{ oldPic?.id ? '修改图片' : '创建图片' }}</h2>
 
     <!--    图片上传组件url-->
@@ -14,7 +18,11 @@
 
     <a-form v-if="picture?.id" layout="vertical" :model="pictureForm" @finish="handleSubmit">
       <a-form-item label="名称" name="name">
-        <a-input v-model:value="pictureForm.name" :default-value="picture?.picName" placeholder="请输入名称" />
+        <a-input
+          v-model:value="pictureForm.name"
+          :default-value="picture?.picName"
+          placeholder="请输入名称"
+        />
       </a-form-item>
       <a-form-item label="简介" name="introduction">
         <a-textarea
@@ -52,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import PictureUpload from '@/pages/picture/components/PictureUpload.vue'
 import { message } from 'ant-design-vue'
 import {
@@ -70,6 +78,11 @@ const onSuccess = (newPicture: API.PictureVo) => {
 }
 const router = useRouter()
 const activeKey = ref<'file' | 'url'>('file')
+
+const spaceId = computed(() => {
+  return route.query?.spaceId
+})
+
 /**
  * 提交表单
  * @param values
@@ -79,8 +92,10 @@ const handleSubmit = async (values: any) => {
   if (!pictureId) {
     return
   }
+
   const res = await editePictureUsingPost({
     id: pictureId,
+    spaceId: spaceId.value,
     ...values,
   })
   if (res.data.code === 0 && res.data.data) {

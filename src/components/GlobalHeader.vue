@@ -15,7 +15,7 @@
         </div>
         <template #overlay>
           <a-menu>
-            <a-menu-item key="profile">
+            <a-menu-item @click="goMySpace" key="profile">
               <UserOutlined />
               <span>个人信息</span>
             </a-menu-item>
@@ -40,15 +40,15 @@
 <script lang="ts" setup>
 import { computed, h, ref } from 'vue'
 import { HomeOutlined, UserOutlined, SettingOutlined, LogoutOutlined } from '@ant-design/icons-vue'
-import type { MenuProps } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore'
 import { message } from 'ant-design-vue'
 import { userLogoutUsingPost } from '@/service/api/userController'
-import PictureUpload from "@/pages/picture/components/PictureUpload.vue";
 const current = ref<string[]>(['mail'])
 const userStore = useLoginUserStore()
-
+const goMySpace = () => {
+  router.push('/user/space')
+}
 const baseMenuItems = [
   {
     key: '/',
@@ -64,7 +64,7 @@ const baseMenuItems = [
   {
     key: '/picture/upload',
     label: '图片上传',
-    title:  '图片上传',
+    title: '图片上传',
   },
   {
     key: '/admin/userManage',
@@ -79,13 +79,11 @@ const baseMenuItems = [
     role: 'admin',
   },
 
-
   {
     key: '/others',
     label: h('a', { href: 'https://github.com/noeltzy', target: '_blank' }, '支持我'),
     title: '支持我',
   },
-
 ]
 
 const filterMenuItems = (items = [] as typeof baseMenuItems) => {

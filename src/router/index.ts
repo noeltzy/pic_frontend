@@ -9,7 +9,10 @@ import { message } from 'ant-design-vue'
 import AddPicturePage from '@/pages/picture/AddPicturePage.vue'
 import PictureManagePage from '@/pages/admin/PictureManagePage.vue'
 import PictureDetailPage from '@/pages/picture/PictureDetailPage.vue'
-import BatchAddPicturePage from "@/pages/picture/BatchAddPicturePage.vue";
+import BatchAddPicturePage from '@/pages/picture/BatchAddPicturePage.vue'
+import UserSpace from '@/pages/space/UserSpace.vue'
+import AddSpacePage from '@/pages/space/AddSpacePage.vue'
+import SpaceDetailPage from '@/pages/space/components/SpaceDetailPage.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -28,6 +31,7 @@ const router = createRouter({
       name: '用户注册',
       component: UserRegisterPage,
     },
+
     {
       path: '/picture/upload',
       name: '用户注册',
@@ -37,6 +41,11 @@ const router = createRouter({
       path: '/admin/userManage',
       name: '用户管理',
       component: UserManagePage,
+    },
+    {
+      path: '/user/space',
+      name: '用户空间',
+      component: UserSpace,
     },
     {
       path: '/picture/:id',
@@ -58,6 +67,17 @@ const router = createRouter({
       path: '/about',
       name: 'about',
       component: AboutView,
+    },
+    {
+      path: '/add_space',
+      name: '创建空间',
+      component: AddSpacePage,
+    },
+    {
+      path: '/space/:id',
+      name: '空间详情',
+      component: SpaceDetailPage,
+      props: true,
     },
   ],
 })
