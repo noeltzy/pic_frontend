@@ -14,7 +14,7 @@
           <span class="username">{{ userStore.loginUser.userName ?? '默认用户' }}</span>
         </div>
         <template #overlay>
-          <a-menu>
+          <a-menu class="user-dropdown-menu">
             <a-menu-item @click="goMySpace" key="profile">
               <UserOutlined />
               <span>个人信息</span>
@@ -23,8 +23,8 @@
               <SettingOutlined />
               <span>设置</span>
             </a-menu-item>
-            <a-menu-divider />
-            <a-menu-item key="logout" @click="handleLogout">
+            <a-menu-divider class="compact-divider" />
+            <a-menu-item key="logout" @click="handleLogout" class="logout-item">
               <LogoutOutlined />
               <span>退出登录</span>
             </a-menu-item>
@@ -191,15 +191,31 @@ const handleLogout = async () => {
   color: rgba(0, 0, 0, 0.85);
 }
 
-:deep(.ant-dropdown-menu) {
-  min-width: 160px;
+:deep(.user-dropdown-menu) {
+  min-width: 120px;
+  padding: 4px 0;
 }
 
-:deep(.ant-dropdown-menu-item) {
-  padding: 8px 16px;
+:deep(.user-dropdown-menu .ant-dropdown-menu-item) {
+  padding: 6px 12px;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
-:deep(.ant-dropdown-menu-item .anticon) {
-  margin-right: 8px;
+:deep(.user-dropdown-menu .ant-dropdown-menu-item .anticon) {
+  margin-right: 6px;
+  font-size: 13px;
+}
+
+:deep(.user-dropdown-menu .compact-divider) {
+  margin: 4px 0;
+}
+
+:deep(.user-dropdown-menu .logout-item) {
+  color: #ff4d4f;
+}
+
+:deep(.user-dropdown-menu .logout-item:hover) {
+  background-color: #fff1f0;
 }
 </style>

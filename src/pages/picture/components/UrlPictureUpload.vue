@@ -8,7 +8,7 @@
       size="large"
       @search="handleUpload"
     />
-    <img v-if="picture?.url" :src="picture?.url" alt="avatar" />
+    <img v-if="picture?.url" :src="picture?.thumbnailUrl??picture?.url" alt="avatar" />
   </div>
 </template>
 <script lang="ts" setup>

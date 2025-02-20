@@ -158,28 +158,29 @@ declare namespace API {
     id?: number
   }
 
-  type getSpaceVoByIdUsingGETParams = {
-    /** id */
-    id?: number
+  type getSpaceCategoryAnalyzeUsingPOSTParams = {
+    queryAll?: boolean
+    queryPublic?: boolean
+    spaceId?: number
   }
 
-  type getSpaceVoByIdUsingPOST1Params = {
+  type getSpaceRankAnalyzeUsingPOSTParams = {
     topN?: number
   }
 
-  type getSpaceVoByIdUsingPOST2Params = {
+  type getSpaceTagAnalyzeUsingPOSTParams = {
     queryAll?: boolean
     queryPublic?: boolean
     spaceId?: number
   }
 
-  type getSpaceVoByIdUsingPOST3Params = {
+  type getSpaceUsageAnalyzeUsingPOSTParams = {
     queryAll?: boolean
     queryPublic?: boolean
     spaceId?: number
   }
 
-  type getSpaceVoByIdUsingPOST4Params = {
+  type getSpaceUserAnalyzeUsingPOSTParams = {
     queryAll?: boolean
     queryPublic?: boolean
     spaceId?: number
@@ -187,10 +188,9 @@ declare namespace API {
     userId?: number
   }
 
-  type getSpaceVoByIdUsingPOSTParams = {
-    queryAll?: boolean
-    queryPublic?: boolean
-    spaceId?: number
+  type getSpaceVoByIdUsingGETParams = {
+    /** id */
+    id?: number
   }
 
   type getUserByIdUsingGETParams = {
@@ -279,6 +279,7 @@ declare namespace API {
     reviewerId?: number
     spaceId?: number
     tags?: string
+    thumbnailUrl?: string
     updateTime?: string
     url?: string
     userId?: number
@@ -365,6 +366,7 @@ declare namespace API {
     picWidth?: number
     spaceId?: number
     tags?: string[]
+    thumbnailUrl?: string
     updateTime?: string
     url?: string
     userId?: number

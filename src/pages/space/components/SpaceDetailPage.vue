@@ -1,48 +1,222 @@
 <template>
-  <!-- 空间信息 -->
-  <a-flex justify="space-between">
-    <h2>{{ space.spaceName }}（私有空间）</h2>
-    <a-space size="middle">
-      <a-button type="primary" :href="`/picture/upload?spaceId=${id}`" target="_blank">
-        + 创建图片
-      </a-button>
-      <a-tooltip :title="`占用空间 ${space.totalSize} / ${space.maxSize}`">
-        <a-progress
-          type="circle"
-          :percent="
-            space.totalSize && space.maxSize
-              ? ((space.totalSize * 100) / space.maxSize).toFixed(1)
-              : 0
-          "
-          :size="42"
-        />
-      </a-tooltip>
-    </a-space>
-  </a-flex>
+  <a-card :bordered="false" class="space-detail-page">
+    <!-- 空间信息头部 -->
+    <a-skeleton :loading="loading" active>
+      <a-row class="space-header" align="middle" :gutter="[16, 16]">
+        <a-col :span="16">
+          <a-space direction="vertical" size="small">
+            <a-space align="center">
+              <h2 class="space-title">{{ space.spaceName }}</h2>
+              <a-tag color="blue">私有空间</a-tag>
+              <a-tag :color="spaceLevelColor">{{ spaceLevelText }}</a-tag>
+            </a-space>
+            <a-space class="space-info">
+              <span>创建时间：{{ formatDate(space.createTime) }}</span>
+              <a-divider type="vertical" />
+              <span>图片数量：{{ total }} / {{ space.maxCount }}</span>
+            </a-space>
+          </a-space>
+        </a-col>
+        <a-col :span="8" style="text-align: right">
+          <a-space size="middle" align="center">
+            <a-button
+              type="primary"
+              :href="`/picture/upload?spaceId=${id}`"
+              target="_blank"
+              :disabled="isSpaceFull"
+            >
+              <template #icon><upload-outlined /></template>
+              上传图片
+            </a-button>
+            <a-tooltip>
+              <template #title>
+                已使用：{{ formatSize(space.totalSize) }} / {{ formatSize(space.maxSize) }}
+              </template>
+              <a-progress
+                type="circle"
+                :percent="spaceUsagePercent"
+                :size="48"
+                :status="isSpaceFull ? 'exception' : undefined"
+              />
+            </a-tooltip>
+          </a-space>
+        </a-col>
+      </a-row>
+    </a-skeleton>
 
-  <!-- 图片列表 -->
-  <SpacePictureList :dataList="dataList" :loading="loading" />
-  <a-pagination
-    style="text-align: right"
-    v-model:current="searchParams.current"
-    v-model:pageSize="searchParams.pageSize"
-    :total="total"
-    :show-total="() => `图片总数 ${total} / ${space.maxCount}`"
-    @change="onPageChange"
-  />
+    <!-- 搜索和筛选区域 -->
+    <a-card class="filter-card" :bordered="false">
+      <a-form layout="inline">
+        <a-form-item label="图片名称">
+          <a-input
+            v-model:value="searchParams.name"
+            placeholder="请输入图片名称"
+            allow-clear
+            @change="handleSearch"
+          />
+        </a-form-item>
+        <a-form-item label="图片格式">
+          <a-select
+            v-model:value="searchParams.picFormat"
+            placeholder="请选择格式"
+            style="width: 120px"
+            allow-clear
+            @change="handleSearch"
+          >
+            <a-select-option value="PNG">PNG</a-select-option>
+            <a-select-option value="JPG">JPG</a-select-option>
+            <a-select-option value="GIF">GIF</a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item>
+          <a-button type="primary" @click="handleSearch">
+            <template #icon><search-outlined /></template>
+            搜索
+          </a-button>
+        </a-form-item>
+      </a-form>
+    </a-card>
+
+    <!-- 图片列表 -->
+    <a-card :bordered="false" class="list-card">
+      <template #extra>
+        <a-radio-group v-model:value="viewMode" button-style="solid">
+          <a-radio-button value="grid">
+            <template #icon><app-store-outlined /></template>
+            网格视图
+          </a-radio-button>
+          <a-radio-button value="list">
+            <template #icon><bars-outlined /></template>
+            列表视图
+          </a-radio-button>
+        </a-radio-group>
+      </template>
+
+      <SpacePictureList
+        :dataList="dataList"
+        :loading="loading"
+        :viewMode="viewMode"
+        @refresh="fetchData"
+      />
+
+      <div class="pagination-container">
+        <a-pagination
+          v-model:current="searchParams.current"
+          v-model:pageSize="searchParams.pageSize"
+          :total="total"
+          :show-total="(totalCount: number) => `共 ${totalCount} 张图片`"
+          :show-size-changer="true"
+          :page-size-options="['12', '24', '36', '48']"
+          @change="onPageChange"
+        />
+      </div>
+    </a-card>
+  </a-card>
 </template>
+
 <script lang="ts" setup>
 import { listPictureVoPageUsingPost } from '@/service/api/pictureController'
+import { getSpaceVoByIdUsingGet } from '@/service/api/spaceController'
 import SpacePictureList from './SpacePictureList.vue'
 import { message } from 'ant-design-vue'
-import { onMounted, reactive, ref } from 'vue'
-import { getSpaceVoByIdUsingGet } from '@/service/api/spaceController'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useLoginUserStore } from '@/stores/useLoginUserStore'
+import {
+  UploadOutlined,
+  SearchOutlined,
+  AppstoreOutlined as AppStoreOutlined,
+  BarsOutlined,
+} from '@ant-design/icons-vue'
+import { SPACE_LEVEL_MAP } from '@/constants/space'
+
+// 防抖函数
+function useDebounce<T extends (...args: unknown[]) => void>(
+  fn: T,
+  delay: number,
+): (...args: Parameters<T>) => void {
+  let timeoutId: ReturnType<typeof setTimeout>
+  return (...args: Parameters<T>) => {
+    clearTimeout(timeoutId)
+    timeoutId = setTimeout(() => fn(...args), delay)
+  }
+}
+
+// Props 定义
+interface Props {
+  id: number
+}
+const props = defineProps<Props>()
+
+// Store
 const loginUserStore = useLoginUserStore()
-const props = defineProps<{
-  id: string | number
-}>()
+
+// 状态定义
 const space = ref<API.SpaceVO>({})
+const dataList = ref<API.PictureVo[]>([])
+const total = ref<number>(0)
+const loading = ref<boolean>(true)
+const viewMode = ref<'grid' | 'list'>('grid')
+
+// 计算属性
+const spaceUsagePercent = computed(() => {
+  if (!space.value.totalSize || !space.value.maxSize) return 0
+  return Number(((space.value.totalSize * 100) / space.value.maxSize).toFixed(1))
+})
+
+const isSpaceFull = computed(() => {
+  return spaceUsagePercent.value >= 100
+})
+
+const spaceLevelText = computed(() => {
+  const level = space.value.spaceLevel ?? 0
+  return SPACE_LEVEL_MAP[level] || '未知级别'
+})
+
+const spaceLevelColor = computed(() => {
+  const level = space.value.spaceLevel ?? 0
+  switch (level) {
+    case 0: // 普通版
+      return 'blue'
+    case 1: // 专业版
+      return 'purple'
+    case 2: // 旗舰版
+      return 'gold'
+    default:
+      return 'default'
+  }
+})
+
+// 搜索参数
+const searchParams = reactive<API.PictureQueryRequest>({
+  current: 1,
+  pageSize: 12,
+  sortField: 'createTime',
+  sortOrder: 'descend',
+  name: undefined,
+  picFormat: undefined,
+})
+
+// 工具函数
+const formatDate = (date: string | undefined) => {
+  if (!date) return '-'
+  return new Date(date).toLocaleDateString('zh-CN', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+}
+
+const formatSize = (size: number | undefined) => {
+  if (!size) return '0 B'
+  const units = ['B', 'KB', 'MB', 'GB']
+  let value = size
+  let unitIndex = 0
+  while (value >= 1024 && unitIndex < units.length - 1) {
+    value /= 1024
+    unitIndex++
+  }
+  return `${value.toFixed(2)} ${units[unitIndex]}`
+}
 
 // 获取空间详情
 const fetchSpaceDetail = async () => {
@@ -55,60 +229,79 @@ const fetchSpaceDetail = async () => {
     } else {
       message.error('获取空间详情失败，' + res.data.message)
     }
-  } catch (e: any) {
-    message.error('获取空间详情失败：' + e.message)
+  } catch (error: unknown) {
+    const err = error as Error
+    message.error('获取空间详情失败：' + err.message)
   }
 }
 
-onMounted(() => {
-  fetchSpaceDetail()
-})
+// 获取图片列表数据
+const fetchData = async () => {
+  loading.value = true
+  try {
+    const params: API.PictureQueryRequest = {
+      ...searchParams,
+      spaceId: props.id,
+      userId: loginUserStore.loginUser.id,
+    }
 
-// 数据
-const dataList = ref([])
-const total = ref(0)
-const loading = ref(true)
+    const res = await listPictureVoPageUsingPost(params)
+    if (res.data.code === 0 && res.data.data) {
+      dataList.value = res.data.data.records || []
+      total.value = res.data.data.total || 0
+    } else {
+      message.error('获取数据失败，' + res.data.message)
+    }
+  } catch (error: unknown) {
+    const err = error as Error
+    message.error('获取数据失败：' + err.message)
+  } finally {
+    loading.value = false
+  }
+}
 
-// 搜索条件
-const searchParams = reactive<API.PictureQueryRequest>({
-  current: 1,
-  pageSize: 12,
-  sortField: 'createTime',
-  sortOrder: 'descend',
-})
+// 事件处理
+const handleSearch = useDebounce(() => {
+  searchParams.current = 1
+  fetchData()
+}, 300)
 
-// 分页参数
-const onPageChange = (page, pageSize) => {
+const onPageChange = (page: number, pageSize: number) => {
   searchParams.current = page
   searchParams.pageSize = pageSize
   fetchData()
 }
 
-// 获取数据
-const fetchData = async () => {
-  console.log(space.value.user?.id)
-  loading.value = true
-  // 转换搜索参数
-  const params = {
-    spaceId: props.id,
-    userId: loginUserStore.loginUser.id,
-    ...searchParams,
-  }
-
-  const res = await listPictureVoPageUsingPost(params)
-  if (res.data.data) {
-    dataList.value = res.data.data.records ?? []
-    total.value = res.data.data.total ?? 0
-  } else {
-    message.error('获取数据失败，' + res.data.message)
-  }
-  loading.value = false
-}
-
-// 页面加载时请求一次
+// 生命周期
 onMounted(() => {
+  fetchSpaceDetail()
   fetchData()
 })
 </script>
 
-<style></style>
+<style scoped>
+.space-detail-page .space-header {
+  margin-bottom: 24px;
+}
+
+.space-detail-page .space-header .space-title {
+  margin: 0;
+  font-size: 24px;
+  display: inline-block;
+}
+
+.space-detail-page .space-header .space-info {
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 14px;
+}
+
+.space-detail-page .filter-card {
+  margin-bottom: 24px;
+  background: #fafafa;
+}
+
+.space-detail-page .list-card .pagination-container {
+  margin-top: 16px;
+  text-align: right;
+}
+</style>

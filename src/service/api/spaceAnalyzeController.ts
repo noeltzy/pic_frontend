@@ -2,10 +2,10 @@
 /* eslint-disable */
 import request from '@/request'
 
-/** getSpaceVoById POST /api/space/analyze/category */
-export async function getSpaceVoByIdUsingPost2(
+/** getSpaceCategoryAnalyze POST /api/space/analyze/category */
+export async function getSpaceCategoryAnalyzeUsingPost(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.getSpaceVoByIdUsingPOST2Params,
+  params: API.getSpaceCategoryAnalyzeUsingPOSTParams,
   options?: { [key: string]: any }
 ) {
   return request<API.BaseResponseListSpaceCategoryAnalyzeResponse_>('/api/space/analyze/category', {
@@ -17,10 +17,10 @@ export async function getSpaceVoByIdUsingPost2(
   })
 }
 
-/** getSpaceVoById POST /api/space/analyze/rank */
-export async function getSpaceVoByIdUsingPost1(
+/** getSpaceRankAnalyze POST /api/space/analyze/rank */
+export async function getSpaceRankAnalyzeUsingPost(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.getSpaceVoByIdUsingPOST1Params,
+  params: API.getSpaceRankAnalyzeUsingPOSTParams,
   options?: { [key: string]: any }
 ) {
   return request<API.BaseResponseListSpace_>('/api/space/analyze/rank', {
@@ -32,10 +32,10 @@ export async function getSpaceVoByIdUsingPost1(
   })
 }
 
-/** getSpaceVoById POST /api/space/analyze/tag */
-export async function getSpaceVoByIdUsingPost3(
+/** getSpaceTagAnalyze POST /api/space/analyze/tag */
+export async function getSpaceTagAnalyzeUsingPost(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.getSpaceVoByIdUsingPOST3Params,
+  params: API.getSpaceTagAnalyzeUsingPOSTParams,
   options?: { [key: string]: any }
 ) {
   return request<API.BaseResponseListSpaceTagAnalyzeResponse_>('/api/space/analyze/tag', {
@@ -47,10 +47,10 @@ export async function getSpaceVoByIdUsingPost3(
   })
 }
 
-/** getSpaceVoById POST /api/space/analyze/usage */
-export async function getSpaceVoByIdUsingPost(
+/** getSpaceUsageAnalyze POST /api/space/analyze/usage */
+export async function getSpaceUsageAnalyzeUsingPost(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.getSpaceVoByIdUsingPOSTParams,
+  params: API.getSpaceUsageAnalyzeUsingPOSTParams,
   options?: { [key: string]: any }
 ) {
   return request<API.BaseResponseSpaceUsageAnalyzeResponse_>('/api/space/analyze/usage', {
@@ -62,10 +62,10 @@ export async function getSpaceVoByIdUsingPost(
   })
 }
 
-/** getSpaceVoById POST /api/space/analyze/user */
-export async function getSpaceVoByIdUsingPost4(
+/** getSpaceUserAnalyze POST /api/space/analyze/user */
+export async function getSpaceUserAnalyzeUsingPost(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
-  params: API.getSpaceVoByIdUsingPOST4Params,
+  params: API.getSpaceUserAnalyzeUsingPOSTParams,
   options?: { [key: string]: any }
 ) {
   return request<API.BaseResponseListSpaceUserAnalyzeResponse_>('/api/space/analyze/user', {

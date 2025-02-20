@@ -49,7 +49,7 @@
             <a-list-item>
               <div class="picture-card" @click="handleCardClick(item.id)">
                 <div class="picture-container">
-                  <img :src="item.url" :alt="item.picName" />
+                  <img :src="item.thumbnailUrl??item.url" :alt="item.picName" loading="lazy"/>
                 </div>
                 <div class="picture-info">
                   <h4>{{ item.picName }}</h4>
@@ -64,7 +64,7 @@
             </a-list-item>
           </template>
         </a-list>
-        
+
       </div>
     </div>
   </div>
