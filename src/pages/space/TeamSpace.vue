@@ -24,7 +24,7 @@ const checkUserSpace = async () => {
   // 获取用户空间信息
   const res = await listSpaceVoPageUsingPost({
     userId: loginUser.id,
-    spaceType: 0,
+    spaceType: 1,
     current: 1,
     pageSize: 1,
   })
@@ -33,13 +33,13 @@ const checkUserSpace = async () => {
       const space = res.data.data.records[0]
       console.log(space)
 
-      router.replace(`/space/${space.id}?spaceType=0`)
+      router.replace(`/space/${space.id}?spaceType=1`)
     } else {
-      router.replace('/add_space?spaceType=0')
-      message.warn('请先创建空间')
+      router.replace('/add_space?spaceType=1')
+      message.warn('请先创建团队空间')
     }
   } else {
-    message.error('加载我的空间失败，' + res.data.message)
+    message.error('加载我的团队空间失败，' + res.data.message)
   }
 }
 
@@ -47,5 +47,4 @@ const checkUserSpace = async () => {
 onMounted(() => {
   checkUserSpace()
 })
-
 </script>

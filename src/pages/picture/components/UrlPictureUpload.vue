@@ -8,13 +8,12 @@
       size="large"
       @search="handleUpload"
     />
-    <img v-if="picture?.url" :src="picture?.thumbnailUrl??picture?.url" alt="avatar" />
+    <img v-if="picture?.url" :src="picture?.thumbnailUrl ?? picture?.url" alt="avatar" />
   </div>
 </template>
 <script lang="ts" setup>
 import { uploadPictureByUrlUsingPost } from '@/service/api/pictureController.ts'
-import { ref, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref } from 'vue'
 import { message } from 'ant-design-vue'
 interface Props {
   picture?: API.PictureVo
@@ -22,12 +21,6 @@ interface Props {
 }
 const fileUrl = ref<string>()
 const props = defineProps<Props>()
-
-const route = useRoute()
-
-const spaceId = computed(() => {
-  return route.query?.spaceId
-})
 
 const handleUpload = async () => {
   let params: { id?: number | string; url?: string }

@@ -55,6 +55,9 @@ const router = useRouter()
 const doClickPicture = (picture) => {
   router.push({
     path: `/picture/${picture.id}`,
+    query: {
+      spaceId: picture.spaceId,
+    },
   })
 }
 </script>

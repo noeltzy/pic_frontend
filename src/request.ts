@@ -30,6 +30,10 @@ request.interceptors.response.use((response) => {
       window.location.href = `/user/login?redirect=${window.location.href}`
     }
   }
+  if (data.code == 40101) {
+    message.warning('操作无权限,自动跳回首页')
+    window.location.href = '/noAuth'
+  }
   return response
 })
 

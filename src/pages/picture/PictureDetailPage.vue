@@ -68,6 +68,15 @@
             <a-button type="primary" @click="handleDownload"
               ><DownloadOutlined /> 免费下载
             </a-button>
+            <!-- 加一个间隔 -->
+            <a-divider type="vertical" />
+            <a-button
+              v-if="spaceId"
+              type="primary"
+              :href="`/picture/upload?id=${picture?.id}&spaceId=${spaceId}`"
+              target="_blank"
+              ><DownloadOutlined /> 编辑图片
+            </a-button>
           </div>
         </div>
       </div>
@@ -78,8 +87,9 @@
 <script setup lang="ts">
 import { getPictureVoByIdUsingGet } from '@/service/api/pictureController'
 import { DownloadOutlined } from '@ant-design/icons-vue'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { message } from 'ant-design-vue'
+import { useRoute } from 'vue-router'
 
 const props = defineProps<{
   id: string | number | undefined
@@ -101,6 +111,11 @@ const fetchPicture = async () => {
     message.error('获取图片详情失败')
   }
 }
+
+const route = useRoute()
+const spaceId = computed(() => {
+  return route.query?.spaceId
+})
 
 // 格式化文件大小
 const formatFileSize = (size?: number) => {

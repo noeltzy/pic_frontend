@@ -5,6 +5,18 @@ declare namespace API {
     message?: string
   }
 
+  type BaseResponseCreateTaskResponse_ = {
+    code?: number
+    data?: CreateTaskResponse
+    message?: string
+  }
+
+  type BaseResponseGetOutPaintingTaskResponse_ = {
+    code?: number
+    data?: GetOutPaintingTaskResponse
+    message?: string
+  }
+
   type BaseResponseInt_ = {
     code?: number
     data?: number
@@ -38,6 +50,12 @@ declare namespace API {
   type BaseResponseListSpaceUserAnalyzeResponse_ = {
     code?: number
     data?: SpaceUserAnalyzeResponse[]
+    message?: string
+  }
+
+  type BaseResponseListSpaceUserVO_ = {
+    code?: number
+    data?: SpaceUserVO[]
     message?: string
   }
 
@@ -143,9 +161,31 @@ declare namespace API {
     message?: string
   }
 
+  type CreatePictureOutPaintingTaskRequest = {
+    parameters?: Parameters
+    pictureId?: number
+  }
+
+  type CreateTaskResponse = {
+    code?: string
+    message?: string
+    output?: Output
+    requestId?: string
+  }
+
+  type GetOutPaintingTaskResponse = {
+    output?: Output1
+    requestId?: string
+  }
+
   type getPictureByIdUsingGETParams = {
     /** id */
     id?: number
+  }
+
+  type getPictureOutPaintingTaskUsingGETParams = {
+    /** taskId */
+    taskId?: string
   }
 
   type getPictureVoByIdUsingGETParams = {
@@ -220,6 +260,23 @@ declare namespace API {
     userRole?: string
   }
 
+  type Output = {
+    taskId?: string
+    taskStatus?: string
+  }
+
+  type Output1 = {
+    code?: string
+    endTime?: string
+    message?: string
+    outputImageUrl?: string
+    scheduledTime?: string
+    submitTime?: string
+    taskId?: string
+    taskMetrics?: TaskMetrics
+    taskStatus?: string
+  }
+
   type PagePicture_ = {
     current?: number
     pages?: number
@@ -258,6 +315,20 @@ declare namespace API {
     records?: UserVo[]
     size?: number
     total?: number
+  }
+
+  type Parameters = {
+    addWatermark?: boolean
+    angle?: number
+    bestQuality?: boolean
+    bottomOffset?: number
+    leftOffset?: number
+    limitImageSize?: boolean
+    outputRatio?: string
+    rightOffset?: number
+    topOffset?: number
+    xScale?: number
+    yScale?: number
   }
 
   type Picture = {
@@ -382,6 +453,7 @@ declare namespace API {
     maxSize?: number
     spaceLevel?: number
     spaceName?: string
+    spaceType?: number
     totalCount?: number
     totalSize?: number
     updateTime?: string
@@ -391,6 +463,7 @@ declare namespace API {
   type SpaceAddRequest = {
     spaceLevel?: number
     spaceName?: string
+    spaceType?: number
   }
 
   type SpaceCategoryAnalyzeResponse = {
@@ -419,6 +492,7 @@ declare namespace API {
     sortOrder?: string
     spaceLevel?: number
     spaceName?: string
+    spaceType?: number
     userId?: number
   }
 
@@ -449,6 +523,17 @@ declare namespace API {
     period?: string
   }
 
+  type SpaceUserVO = {
+    createTime?: string
+    id?: number
+    space?: SpaceVO
+    spaceId?: number
+    spaceRole?: string
+    updateTime?: string
+    user?: UserVo
+    userId?: number
+  }
+
   type SpaceVO = {
     createTime?: string
     editTime?: string
@@ -457,11 +542,18 @@ declare namespace API {
     maxSize?: number
     spaceLevel?: number
     spaceName?: string
+    spaceType?: number
     totalCount?: number
     totalSize?: number
     updateTime?: string
     user?: UserVo
     userId?: number
+  }
+
+  type TaskMetrics = {
+    failed?: number
+    succeeded?: number
+    total?: number
   }
 
   type uploadPictureUsingPOSTParams = {

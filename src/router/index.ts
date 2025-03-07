@@ -15,6 +15,8 @@ import AddSpacePage from '@/pages/space/AddSpacePage.vue'
 import SpaceDetailPage from '@/pages/space/components/SpaceDetailPage.vue'
 import BasicLayout from '@/layouts/BasicLayout.vue'
 import UserLayout from '@/layouts/UserLayout.vue'
+import NoAuth from '@/pages/noAuth/NoAuth.vue'
+import TeamSpace from '@/pages/space/TeamSpace.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -62,6 +64,11 @@ const router = createRouter({
           component: UserSpace,
         },
         {
+          path: 'team/space',
+          name: '团队空间',
+          component: TeamSpace,
+        },
+        {
           path: 'picture/:id',
           name: '图片详情',
           component: PictureDetailPage,
@@ -92,6 +99,11 @@ const router = createRouter({
           name: '空间详情',
           component: SpaceDetailPage,
           props: true,
+        },
+        {
+          path: 'noAuth',
+          name: '无权限',
+          component: NoAuth,
         },
       ],
     },

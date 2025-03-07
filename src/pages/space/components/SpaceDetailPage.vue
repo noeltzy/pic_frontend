@@ -7,7 +7,7 @@
           <a-space direction="vertical" size="small">
             <a-space align="center">
               <h2 class="space-title">{{ space.spaceName }}</h2>
-              <a-tag color="blue">私有空间</a-tag>
+              <a-tag color="blue">{{ space.spaceType == 0 ? '私有空间' : '团队空间' }}</a-tag>
               <a-tag :color="spaceLevelColor">{{ spaceLevelText }}</a-tag>
             </a-space>
             <a-space class="space-info">
@@ -28,6 +28,11 @@
               <template #icon><upload-outlined /></template>
               上传图片
             </a-button>
+            <a-button type="primary" :href="`/picture/upload?spaceId=${id}`" target="_blank">
+              <template #icon><upload-outlined /></template>
+              AI生成图片
+            </a-button>
+
             <a-tooltip>
               <template #title>
                 已使用：{{ formatSize(space.totalSize) }} / {{ formatSize(space.maxSize) }}
@@ -78,39 +83,23 @@
     </a-card>
 
     <!-- 图片列表 -->
-    <a-card :bordered="false" class="list-card">
-      <template #extra>
-        <a-radio-group v-model:value="viewMode" button-style="solid">
-          <a-radio-button value="grid">
-            <template #icon><app-store-outlined /></template>
-            网格视图
-          </a-radio-button>
-          <a-radio-button value="list">
-            <template #icon><bars-outlined /></template>
-            列表视图
-          </a-radio-button>
-        </a-radio-group>
-      </template>
-
-      <SpacePictureList
-        :dataList="dataList"
-        :loading="loading"
-        :viewMode="viewMode"
-        @refresh="fetchData"
+    <SpacePictureList
+      :dataList="dataList"
+      :loading="loading"
+      :viewMode="viewMode"
+      @refresh="fetchData"
+    />
+    <div class="pagination-container">
+      <a-pagination
+        v-model:current="searchParams.current"
+        v-model:pageSize="searchParams.pageSize"
+        :total="total"
+        :show-total="(totalCount: number) => `共 ${totalCount} 张图片`"
+        :show-size-changer="true"
+        :page-size-options="['5', '10']"
+        @change="onPageChange"
       />
-
-      <div class="pagination-container">
-        <a-pagination
-          v-model:current="searchParams.current"
-          v-model:pageSize="searchParams.pageSize"
-          :total="total"
-          :show-total="(totalCount: number) => `共 ${totalCount} 张图片`"
-          :show-size-changer="true"
-          :page-size-options="['12', '24', '36', '48']"
-          @change="onPageChange"
-        />
-      </div>
-    </a-card>
+    </div>
   </a-card>
 </template>
 
@@ -119,7 +108,7 @@ import { listPictureVoPageUsingPost } from '@/service/api/pictureController'
 import { getSpaceVoByIdUsingGet } from '@/service/api/spaceController'
 import SpacePictureList from './SpacePictureList.vue'
 import { message } from 'ant-design-vue'
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useLoginUserStore } from '@/stores/useLoginUserStore'
 import {
   UploadOutlined,
@@ -277,6 +266,14 @@ onMounted(() => {
   fetchSpaceDetail()
   fetchData()
 })
+// 空间 id 改变时，必须重新获取数据
+watch(
+  () => props.id,
+  (newSpaceId) => {
+    fetchSpaceDetail()
+    fetchData()
+  },
+)
 </script>
 
 <style scoped>

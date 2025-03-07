@@ -49,18 +49,38 @@ const spaceId = computed(() => {
   return route.query?.spaceId
 })
 
+/**
+ * 处理图片上传的函数
+ * @param file - 上传的文件对象
+ */
 const handleUpload = async ({ file }: any) => {
+  // 设置加载状态为true，显示加载图标
   loading.value = true
-  const params = props.picture ? { id: props.picture.id } : {}
+
+  // 创建请求参数对象，如果已有图片则包含图片ID
+  const params: any = props.picture ? { id: props.picture.id } : {}
+
+  // 添加空间ID参数，用于指定图片保存的位置
   params.spaceId = spaceId.value
+
+  // 调用上传图片API，发送请求
   const res = await uploadPictureUsingPost(params, {}, file)
+
+  // 检查请求是否成功
   if (res.data?.code === 0 && res.data.data) {
+    // 调用成功回调函数，传递新上传的图片数据
     props.onSuccess?.(res.data.data)
+    // 显示成功提示消息
     message.success('成功')
   }
+
+  // 无论成功与否，最后都将加载状态设为false
   loading.value = false
 }
 </script>
+
+
+
 <style scoped>
 .picture-container:deep(.ant-upload) {
   width: 100% !important;
