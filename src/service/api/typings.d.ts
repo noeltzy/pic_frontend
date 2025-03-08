@@ -41,6 +41,12 @@ declare namespace API {
     message?: string
   }
 
+  type BaseResponseListSpaceMemberVo_ = {
+    code?: number
+    data?: SpaceMemberVo[]
+    message?: string
+  }
+
   type BaseResponseListSpaceTagAnalyzeResponse_ = {
     code?: number
     data?: SpaceTagAnalyzeResponse[]
@@ -214,6 +220,11 @@ declare namespace API {
     spaceId?: number
   }
 
+  type getSpaceTypeUsingGETParams = {
+    /** id */
+    id: number
+  }
+
   type getSpaceUsageAnalyzeUsingPOSTParams = {
     queryAll?: boolean
     queryPublic?: boolean
@@ -245,6 +256,11 @@ declare namespace API {
 
   type IdRequest = {
     id?: number
+  }
+
+  type listMembersUsingPOSTParams = {
+    /** spaceId */
+    spaceId: number
   }
 
   type LoginUserVo = {
@@ -484,6 +500,12 @@ declare namespace API {
     value?: number
   }
 
+  type SpaceMemberVo = {
+    spaceRole?: string
+    userAvatar?: string
+    userId?: number
+  }
+
   type SpaceQueryRequest = {
     current?: number
     id?: number
@@ -516,6 +538,12 @@ declare namespace API {
     sizeUsageRatio?: number
     usedCount?: number
     usedSize?: number
+  }
+
+  type SpaceUserAddRequest = {
+    spaceId?: number
+    spaceRole?: string
+    userId?: number
   }
 
   type SpaceUserAnalyzeResponse = {

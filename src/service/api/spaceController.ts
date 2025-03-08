@@ -112,6 +112,20 @@ export async function listSpaceVoPageUsingPost(
   })
 }
 
+/** getSpaceType GET /api/space/type/${param0} */
+export async function getSpaceTypeUsingGet(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.getSpaceTypeUsingGETParams,
+  options?: { [key: string]: any }
+) {
+  const { id: param0, ...queryParams } = params
+  return request<API.BaseResponseInt_>(`/api/space/type/${param0}`, {
+    method: 'GET',
+    params: { ...queryParams },
+    ...(options || {}),
+  })
+}
+
 /** updateSpace POST /api/space/update */
 export async function updateSpaceUsingPost(
   body: API.SpaceUpdateRequest,

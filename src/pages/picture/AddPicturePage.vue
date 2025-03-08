@@ -14,7 +14,7 @@
       >
       <a-button v-if="isExpandingImage" type="primary" :loading="true" disabled>扩图中...</a-button>
       <a-button v-if="expandTaskCompleted" type="primary" @click="showExpandResult"
-        >查看结果</a-button
+        >完成扩图</a-button
       >
       <a-button v-if="picture?.id" type="primary" @click="openImageEditor">编辑图片</a-button>
     </a-space>
@@ -93,6 +93,8 @@
       <PictureEditor
         v-if="imageEditorVisible && picture?.url"
         :imageUrl="picture.url"
+        :spaceType="spaceType"
+        :picture="picture"
         :onComplete="handleEditorComplete"
       />
       <div class="editor-footer">
@@ -121,6 +123,7 @@ import {
 import { useRoute, useRouter } from 'vue-router'
 import UrlPictureUpload from '@/pages/picture/components/UrlPictureUpload.vue'
 import PictureEditor from '@/pages/picture/components/PictureEditor.vue'
+import { getSpaceTypeUsingGet } from '@/service/api/spaceController'
 
 const taskId = ref<string>()
 const picture = ref<API.PictureVo>()
@@ -365,6 +368,16 @@ const queryExpandTaskStatus = async () => {
 
 const route = useRoute()
 const oldPic = ref<API.PictureVo>()
+const spaceType = ref<number>()
+const getSpaceType = async () => {
+  if (spaceId.value) {
+    const res = await getSpaceTypeUsingGet({ id: spaceId.value })
+    if (res.data.code === 0 && res.data.data) {
+      spaceType.value = res.data.data
+    }
+  }
+}
+
 const getOldPicture = async () => {
   const id = route.query?.id
   // 如果URL携带pictureID 代表是编辑图片，那么首先要获取图片基本信息
@@ -383,6 +396,7 @@ const getOldPicture = async () => {
 }
 onMounted(() => {
   getTagCategory()
+  getSpaceType()
 })
 onMounted(() => {
   getOldPicture()
