@@ -1,5 +1,5 @@
 <template>
-  <div id="mySpace">
+  <div id="myTeamSpace">
     <p>正在跳转，请稍候...</p>
   </div>
 </template>
@@ -14,7 +14,7 @@ import { useLoginUserStore } from '@/stores/useLoginUserStore'
 const router = useRouter()
 const loginUserStore = useLoginUserStore()
 
-// 检查用户是否有个人空间
+// 检查用户是否有团队空间
 const checkUserSpace = async () => {
   const loginUser = loginUserStore.loginUser
   if (!loginUser?.id) {

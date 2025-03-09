@@ -60,6 +60,7 @@ const handleSubmit = async (values: any) => {
   loading.value = true // 开启加载状态
   // 调用创建空间的API
   const res = await addSpaceUsingPost({
+    spaceType: spaceType.value == 0 ? 0 : 1,
     ...formData,
   })
   // 处理API响应结果

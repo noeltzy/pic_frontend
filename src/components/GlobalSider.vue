@@ -46,7 +46,7 @@ const fixedMenuItems: MenuItem[] = [
     icon: () => h(UserOutlined),
   },
   {
-    key: '/add_space?spaceType=1',
+    key: '/add_space',
     label: '创建团队',
     icon: () => h(TeamOutlined),
   },

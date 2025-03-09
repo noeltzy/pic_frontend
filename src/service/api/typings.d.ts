@@ -179,6 +179,40 @@ declare namespace API {
     requestId?: string
   }
 
+  type downloadImageUsingGET1Params = {
+    /** imageUrl */
+    imageUrl: string
+  }
+
+  type downloadImageUsingGETParams = {
+    /** id */
+    id: number
+  }
+
+  type File = {
+    absolute?: boolean
+    absoluteFile?: File
+    absolutePath?: string
+    canonicalFile?: File
+    canonicalPath?: string
+    directory?: boolean
+    file?: boolean
+    freeSpace?: number
+    hidden?: boolean
+    name?: string
+    parent?: string
+    parentFile?: File
+    path?: string
+    totalSpace?: number
+    usableSpace?: number
+  }
+
+  type GenPictureRequest = {
+    input?: Input
+    model?: string
+    parameters?: Parameters1
+  }
+
   type GetOutPaintingTaskResponse = {
     output?: Output1
     requestId?: string
@@ -257,6 +291,13 @@ declare namespace API {
   type IdRequest = {
     id?: number
   }
+
+  type Input = {
+    negative_prompt?: string
+    prompt?: string
+  }
+
+  type InputStream = true
 
   type listMembersUsingPOSTParams = {
     /** spaceId */
@@ -347,6 +388,13 @@ declare namespace API {
     yScale?: number
   }
 
+  type Parameters1 = {
+    n?: number
+    prompt_extend?: boolean
+    size?: string
+    watermark?: boolean
+  }
+
   type Picture = {
     category?: string
     createTime?: string
@@ -355,6 +403,7 @@ declare namespace API {
     introduction?: string
     isDelete?: number
     name?: string
+    originUrl?: string
     picFormat?: string
     picHeight?: number
     picScale?: number
@@ -458,6 +507,17 @@ declare namespace API {
     url?: string
     userId?: number
     userVo?: UserVo
+  }
+
+  type Resource = {
+    description?: string
+    file?: File
+    filename?: string
+    inputStream?: InputStream
+    open?: boolean
+    readable?: boolean
+    uri?: URI
+    url?: URL
   }
 
   type Space = {
@@ -590,6 +650,40 @@ declare namespace API {
     id?: number
     spaceId?: number
     url?: string
+  }
+
+  type URI = {
+    absolute?: boolean
+    authority?: string
+    fragment?: string
+    host?: string
+    opaque?: boolean
+    path?: string
+    port?: number
+    query?: string
+    rawAuthority?: string
+    rawFragment?: string
+    rawPath?: string
+    rawQuery?: string
+    rawSchemeSpecificPart?: string
+    rawUserInfo?: string
+    scheme?: string
+    schemeSpecificPart?: string
+    userInfo?: string
+  }
+
+  type URL = {
+    authority?: string
+    content?: Record<string, any>
+    defaultPort?: number
+    file?: string
+    host?: string
+    path?: string
+    port?: number
+    protocol?: string
+    query?: string
+    ref?: string
+    userInfo?: string
   }
 
   type User = {

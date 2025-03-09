@@ -115,8 +115,6 @@ import {
   editePictureUsingPost,
   getPictureVoByIdUsingGet,
   getTagCategoryUsingGet,
-  createPictureOutPaintingTaskUsingPost,
-  getPictureOutPaintingTaskUsingGet,
   uploadPictureByUrlUsingPost,
   uploadPictureUsingPost,
 } from '@/service/api/pictureController.ts'
@@ -124,6 +122,7 @@ import { useRoute, useRouter } from 'vue-router'
 import UrlPictureUpload from '@/pages/picture/components/UrlPictureUpload.vue'
 import PictureEditor from '@/pages/picture/components/PictureEditor.vue'
 import { getSpaceTypeUsingGet } from '@/service/api/spaceController'
+import { createPictureOutPaintingTaskUsingPost, getPictureOutPaintingTaskUsingGet } from '@/service/api/aiController'
 
 const taskId = ref<string>()
 const picture = ref<API.PictureVo>()

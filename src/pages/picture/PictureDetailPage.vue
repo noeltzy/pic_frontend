@@ -66,7 +66,7 @@
           <!-- 下载按钮 放在最下面 -->
           <div class="button-section">
             <a-button type="primary" @click="handleDownload"
-              ><DownloadOutlined /> 免费下载
+              ><DownloadOutlined /> 下载原图
             </a-button>
             <!-- 加一个间隔 -->
             <a-divider type="vertical" />
@@ -85,7 +85,7 @@
 </template>
 
 <script setup lang="ts">
-import { getPictureVoByIdUsingGet } from '@/service/api/pictureController'
+import { downloadImageUsingGet, getPictureVoByIdUsingGet } from '@/service/api/pictureController'
 import { DownloadOutlined } from '@ant-design/icons-vue'
 import { ref, onMounted, computed } from 'vue'
 import { message } from 'ant-design-vue'
@@ -136,8 +136,13 @@ const formatDate = (date?: string) => {
 }
 
 // 下载图片
-const handleDownload = () => {
-  window.open(picture.value?.url, '_blank')
+const handleDownload = async () => {
+  const res = await downloadImageUsingGet({ id: picture.value?.id })
+  if (res.data.code === 0 && res.data.data) {
+    window.open(res.data.data, '_blank')
+  } else {
+    message.error(res.data.message || '下载失败')
+  }
 }
 
 onMounted(() => {
