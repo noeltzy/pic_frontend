@@ -16,7 +16,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { uploadPictureUsingPost } from '@/service/api/pictureController.ts'
+import { uploadPictureMqUsingPost } from '@/service/api/pictureController.ts'
 
 interface Props {
   picture?: API.PictureVo
@@ -64,7 +64,7 @@ const handleUpload = async ({ file }: any) => {
   params.spaceId = spaceId.value
 
   // 调用上传图片API，发送请求 TODO
-  const res = await uploadPictureUsingPost(params, {}, file)
+  const res = await uploadPictureMqUsingPost(params, {}, file)
   // const res = await uploadPictureMqUsingPost(params, {}, file)
 
   // 检查请求是否成功

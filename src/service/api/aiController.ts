@@ -17,6 +17,21 @@ export async function genPictureCreateTaskUsingPost(
   })
 }
 
+/** getGenPictureTask GET /api/ai/picture/gen_picture/get_task */
+export async function getGenPictureTaskUsingGet(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.getGenPictureTaskUsingGETParams,
+  options?: { [key: string]: any }
+) {
+  return request<API.BaseResponseImageGenerationResponse_>('/api/ai/picture/gen_picture/get_task', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  })
+}
+
 /** createPictureOutPaintingTask POST /api/ai/picture/out_painting/create_task */
 export async function createPictureOutPaintingTaskUsingPost(
   body: API.CreatePictureOutPaintingTaskRequest,

@@ -6,6 +6,9 @@ const request = axios.create({
   timeout: 50000,
   withCredentials: true,
 })
+
+// 设置本地cookie保存时间
+axios.defaults.headers.common['Cookie-Max-Age'] = 60 * 60 * 24 * 7; // 设置cookie保存7天
 // 全局请求拦截器
 request.interceptors.request.use(
   (config) => {

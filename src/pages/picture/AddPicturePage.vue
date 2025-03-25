@@ -27,6 +27,9 @@
       <a-tab-pane key="url" tab="url上传" force-render>
         <UrlPictureUpload :picture="picture" :onSuccess="onSuccess" />
       </a-tab-pane>
+      <a-tab-pane key="mq" tab="mq上传" force-render>
+        <PictureUploadMq :picture="picture" :onSuccess="onSuccess" />
+      </a-tab-pane>
     </a-tabs>
 
     <a-form v-if="picture?.id" layout="vertical" :model="pictureForm" @finish="handleSubmit">
@@ -120,9 +123,13 @@ import {
 } from '@/service/api/pictureController.ts'
 import { useRoute, useRouter } from 'vue-router'
 import UrlPictureUpload from '@/pages/picture/components/UrlPictureUpload.vue'
+import PictureUploadMq from '@/pages/picture/components/PictureUploadMq.vue'
 import PictureEditor from '@/pages/picture/components/PictureEditor.vue'
 import { getSpaceTypeUsingGet } from '@/service/api/spaceController'
-import { createPictureOutPaintingTaskUsingPost, getPictureOutPaintingTaskUsingGet } from '@/service/api/aiController'
+import {
+  createPictureOutPaintingTaskUsingPost,
+  getPictureOutPaintingTaskUsingGet,
+} from '@/service/api/aiController'
 
 const taskId = ref<string>()
 const picture = ref<API.PictureVo>()

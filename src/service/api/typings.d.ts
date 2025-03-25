@@ -17,6 +17,12 @@ declare namespace API {
     message?: string
   }
 
+  type BaseResponseImageGenerationResponse_ = {
+    code?: number
+    data?: ImageGenerationResponse
+    message?: string
+  }
+
   type BaseResponseInt_ = {
     code?: number
     data?: number
@@ -179,32 +185,9 @@ declare namespace API {
     requestId?: string
   }
 
-  type downloadImageUsingGET1Params = {
-    /** imageUrl */
-    imageUrl: string
-  }
-
   type downloadImageUsingGETParams = {
     /** id */
     id: number
-  }
-
-  type File = {
-    absolute?: boolean
-    absoluteFile?: File
-    absolutePath?: string
-    canonicalFile?: File
-    canonicalPath?: string
-    directory?: boolean
-    file?: boolean
-    freeSpace?: number
-    hidden?: boolean
-    name?: string
-    parent?: string
-    parentFile?: File
-    path?: string
-    totalSpace?: number
-    usableSpace?: number
   }
 
   type GenPictureRequest = {
@@ -213,8 +196,13 @@ declare namespace API {
     parameters?: Parameters1
   }
 
+  type getGenPictureTaskUsingGETParams = {
+    /** taskId */
+    taskId?: string
+  }
+
   type GetOutPaintingTaskResponse = {
-    output?: Output1
+    output?: Output2
     requestId?: string
   }
 
@@ -292,12 +280,16 @@ declare namespace API {
     id?: number
   }
 
+  type ImageGenerationResponse = {
+    output?: Output1
+    request_id?: string
+    usage?: Usage
+  }
+
   type Input = {
     negative_prompt?: string
     prompt?: string
   }
-
-  type InputStream = true
 
   type listMembersUsingPOSTParams = {
     /** spaceId */
@@ -323,6 +315,16 @@ declare namespace API {
   }
 
   type Output1 = {
+    end_time?: string
+    results?: Result[]
+    scheduled_time?: string
+    submit_time?: string
+    task_id?: string
+    task_metrics?: TaskMetrics
+    task_status?: string
+  }
+
+  type Output2 = {
     code?: string
     endTime?: string
     message?: string
@@ -330,7 +332,7 @@ declare namespace API {
     scheduledTime?: string
     submitTime?: string
     taskId?: string
-    taskMetrics?: TaskMetrics
+    taskMetrics?: TaskMetrics1
     taskStatus?: string
   }
 
@@ -509,15 +511,10 @@ declare namespace API {
     userVo?: UserVo
   }
 
-  type Resource = {
-    description?: string
-    file?: File
-    filename?: string
-    inputStream?: InputStream
-    open?: boolean
-    readable?: boolean
-    uri?: URI
-    url?: URL
+  type Result = {
+    actual_prompt?: string
+    orig_prompt?: string
+    url?: string
   }
 
   type Space = {
@@ -644,6 +641,20 @@ declare namespace API {
     total?: number
   }
 
+  type TaskMetrics1 = {
+    failed?: number
+    succeeded?: number
+    total?: number
+  }
+
+  type uploadPictureMqUsingPOSTParams = {
+    batchFetchDefaultName?: string
+    category?: string
+    id?: number
+    spaceId?: number
+    url?: string
+  }
+
   type uploadPictureUsingPOSTParams = {
     batchFetchDefaultName?: string
     category?: string
@@ -652,38 +663,8 @@ declare namespace API {
     url?: string
   }
 
-  type URI = {
-    absolute?: boolean
-    authority?: string
-    fragment?: string
-    host?: string
-    opaque?: boolean
-    path?: string
-    port?: number
-    query?: string
-    rawAuthority?: string
-    rawFragment?: string
-    rawPath?: string
-    rawQuery?: string
-    rawSchemeSpecificPart?: string
-    rawUserInfo?: string
-    scheme?: string
-    schemeSpecificPart?: string
-    userInfo?: string
-  }
-
-  type URL = {
-    authority?: string
-    content?: Record<string, any>
-    defaultPort?: number
-    file?: string
-    host?: string
-    path?: string
-    port?: number
-    protocol?: string
-    query?: string
-    ref?: string
-    userInfo?: string
+  type Usage = {
+    image_count?: number
   }
 
   type User = {
