@@ -75,12 +75,12 @@
                   上传图片
                 </a-button>
                 <a-button
+                  v-if="space.spaceType === 0"
                   type="primary"
-                  :href="`/picture/upload?spaceId=${id}`"
-                  target="_blank"
+                  @click="showGenPictureModal"
                   class="action-button ai-button"
                 >
-                  <template #icon><upload-outlined /></template>
+                  <template #icon><robot-outlined /></template>
                   AI生成图片
                 </a-button>
 
@@ -189,13 +189,69 @@
         </a-form-item>
       </a-form>
     </a-modal>
+
+    <!-- 文生图模态框 -->
+    <a-modal
+      v-model:visible="genPictureModalVisible"
+      title="AI生成图片"
+      :footer="null"
+      width="600px"
+    >
+      <a-form layout="vertical">
+        <a-form-item label="提示词">
+          <a-textarea
+            v-model:value="prompt"
+            placeholder="请输入提示词"
+            :rows="4"
+            :maxLength="500"
+            show-count
+          />
+        </a-form-item>
+      </a-form>
+
+      <div class="modal-footer">
+        <a-space>
+          <a-button @click="genPictureModalVisible = false">取消</a-button>
+          <a-button
+            v-if="!currentTaskId && !genPictureResult"
+            type="primary"
+            :loading="genPictureLoading"
+            @click="handleGenPicture"
+          >
+            生成图片
+          </a-button>
+          <a-button
+            v-if="currentTaskId && !genPictureResult"
+            type="primary"
+            :loading="queryGenPictureLoading"
+            @click="handleQueryGenPicture"
+          >
+            查询结果
+          </a-button>
+          <a-button v-if="genPictureResult" type="primary" @click="handleDownloadResult">
+            下载结果
+          </a-button>
+        </a-space>
+      </div>
+
+      <div v-if="genPictureResult" class="result-image">
+        <img :src="genPictureResult" alt="生成结果" />
+      </div>
+    </a-modal>
   </a-card>
 </template>
 
 <script lang="ts" setup>
-import { listPictureVoPageUsingPost } from '@/service/api/pictureController'
+import {
+  listPictureVoPageUsingPost,
+  uploadPictureByUrlUsingPost,
+} from '@/service/api/pictureController'
 import { getSpaceVoByIdUsingGet } from '@/service/api/spaceController'
 import { listMembersUsingPost, addSpaceUserUsingPost } from '@/service/api/spaceUserController'
+import {
+  genPictureCreateTaskV2UsingPost,
+  getGenPictureTaskV2UsingGet,
+} from '@/service/api/aiController'
 import SpacePictureList from './SpacePictureList.vue'
 import { message } from 'ant-design-vue'
 import { computed, onMounted, reactive, ref, watch } from 'vue'
@@ -207,8 +263,7 @@ import {
   PictureOutlined,
   TeamOutlined,
   UserAddOutlined,
-  AppstoreOutlined as AppStoreOutlined,
-  BarsOutlined,
+  RobotOutlined,
 } from '@ant-design/icons-vue'
 import { SPACE_LEVEL_MAP } from '@/constants/space'
 
@@ -292,6 +347,18 @@ const searchParams = reactive<API.PictureQueryRequest>({
   sortOrder: 'descend',
   name: undefined,
   picFormat: undefined,
+})
+
+// 文生图相关状态
+const genPictureModalVisible = ref<boolean>(false)
+const genPictureLoading = ref<boolean>(false)
+const queryGenPictureLoading = ref<boolean>(false)
+const prompt = ref<string>('')
+const currentTaskId = ref<number>()
+const genPictureResult = ref<string>('')
+const genPictureForm = reactive<API.GenPictureTaskRequest>({
+  prompt: '',
+  spaceId: undefined,
 })
 
 // 工具函数
@@ -424,6 +491,134 @@ const onPageChange = (page: number, pageSize: number) => {
   searchParams.current = page
   searchParams.pageSize = pageSize
   fetchData()
+}
+
+// 显示文生图模态框
+const showGenPictureModal = () => {
+  prompt.value = ''
+  currentTaskId.value = undefined
+  genPictureResult.value = ''
+  genPictureForm.prompt = ''
+  genPictureForm.spaceId = props.id
+  genPictureModalVisible.value = true
+}
+
+// 处理文生图
+const handleGenPicture = async () => {
+  if (!prompt.value) {
+    message.error('请输入提示词')
+    return
+  }
+
+  genPictureLoading.value = true
+  try {
+    // 更新表单数据
+    genPictureForm.prompt = prompt.value
+    genPictureForm.spaceId = props.id
+
+    const res = await genPictureCreateTaskV2UsingPost(genPictureForm)
+    if (res.data.code === 0 && res.data.data) {
+      message.success('创建成功')
+      currentTaskId.value = res.data.data.taskId
+      // 开始轮询查询任务状态
+      if (currentTaskId.value) {
+        pollGenPictureTask(currentTaskId.value)
+      }
+    } else {
+      message.error('创建失败，' + res.data.message)
+    }
+  } catch (error: unknown) {
+    const err = error as Error
+    message.error('创建失败：' + err.message)
+  } finally {
+    genPictureLoading.value = false
+  }
+}
+
+// 轮询查询文生图任务状态
+const pollGenPictureTask = async (taskId: number) => {
+  const pollInterval = 2000 // 2秒轮询一次
+  const maxAttempts = 30 // 最多轮询30次，即60秒
+
+  let attempts = 0
+  const poll = async () => {
+    if (attempts >= maxAttempts) {
+      message.info('生成任务已超时，请手动查询结果')
+      return
+    }
+
+    try {
+      const res = await getGenPictureTaskV2UsingGet({ taskId })
+      if (res.data.code === 0 && res.data.data) {
+        const task = res.data.data
+        switch (task.status) {
+          case 'PENDING':
+          case 'RUNNING':
+            attempts++
+            setTimeout(poll, pollInterval)
+            break
+          case 'FAILED':
+            message.error('生成失败')
+            break
+          case 'SUCCEED_1':
+            genPictureResult.value = task.url || ''
+            message.success('生成成功')
+            break
+          case 'SUCCEED_2':
+            message.success('生成成功，请在空间中查看')
+            break
+          default:
+            message.error('未知状态')
+        }
+      }
+    } catch (error) {
+      message.error('查询任务状态失败')
+    }
+  }
+
+  poll()
+}
+
+// 手动查询文生图任务状态
+const handleQueryGenPicture = async () => {
+  if (!currentTaskId.value) return
+
+  queryGenPictureLoading.value = true
+  try {
+    const res = await getGenPictureTaskV2UsingGet({ taskId: currentTaskId.value })
+    if (res.data.code === 0 && res.data.data) {
+      const task = res.data.data
+      switch (task.status) {
+        case 'PENDING':
+        case 'RUNNING':
+          message.info('任务正在处理中')
+          break
+        case 'FAILED':
+          message.error('生成失败')
+          break
+        case 'SUCCEED_1':
+          genPictureResult.value = task.url || ''
+          message.success('生成成功')
+          break
+        case 'SUCCEED_2':
+          message.success('生成成功，请在空间中查看')
+          break
+        default:
+          message.error('未知状态')
+      }
+    }
+  } catch (error) {
+    message.error('查询任务状态失败')
+  } finally {
+    queryGenPictureLoading.value = false
+  }
+}
+
+// 下载生成的图片
+const handleDownloadResult = () => {
+  if (genPictureResult.value) {
+    window.open(genPictureResult.value, '_blank')
+  }
 }
 
 // 生命周期
@@ -582,5 +777,17 @@ watch(
     justify-content: flex-start;
     margin-top: 16px;
   }
+}
+
+.result-image {
+  margin-top: 16px;
+  text-align: center;
+}
+
+.result-image img {
+  max-width: 100%;
+  max-height: 400px;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 </style>

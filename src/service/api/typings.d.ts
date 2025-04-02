@@ -23,6 +23,12 @@ declare namespace API {
     message?: string
   }
 
+  type BaseResponseImageGenTask_ = {
+    code?: number
+    data?: ImageGenTask
+    message?: string
+  }
+
   type BaseResponseInt_ = {
     code?: number
     data?: number
@@ -196,9 +202,19 @@ declare namespace API {
     parameters?: Parameters1
   }
 
+  type GenPictureTaskRequest = {
+    prompt?: string
+    spaceId?: number
+  }
+
   type getGenPictureTaskUsingGETParams = {
     /** taskId */
     taskId?: string
+  }
+
+  type getGenPictureTaskV2UsingGETParams = {
+    /** taskId */
+    taskId?: number
   }
 
   type GetOutPaintingTaskResponse = {
@@ -284,6 +300,15 @@ declare namespace API {
     output?: Output1
     request_id?: string
     usage?: Usage
+  }
+
+  type ImageGenTask = {
+    endTime?: string
+    startTime?: string
+    status?: string
+    taskId?: number
+    url?: string
+    userId?: number
   }
 
   type Input = {

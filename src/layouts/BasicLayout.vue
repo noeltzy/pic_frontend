@@ -22,9 +22,7 @@
               },
             ]"
           >
-            <div class="content-container">
-              <RouterView />
-            </div>
+            <RouterView />
           </a-layout-content>
 
           <!-- 页脚 -->
